@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Orphanage } from "../database/models/orphanages";
 import orphanagesView from "../views/orphanagesView";
+import * as Yup from "yup";
 
 export default {
     async index(req: Request, res: Response) {
@@ -42,6 +43,21 @@ export default {
             }
         })
 
+        const scheme = Yup.object().shape({
+            name: Yup.string().required(),
+            latitude: Yup.number().required(),
+            longitude: Yup.number().required(),
+            about: Yup.string().required().max(300),
+            instructions: Yup.string().required(),
+            openingHours: Yup.string().required(),
+            openOnWeekends: Yup.string().required(),
+            images: Yup.array(
+                Yup.object().shape({
+                    path: Yup.string().required()
+                })
+            )
+        })
+
         const orphanage = {
             name: name,
             latitude: latitude,
@@ -51,7 +67,11 @@ export default {
             openingHours: openingHours,
             openOnWeekends: openOnWeekends,
             images: images
-        } as Orphanage
+        }
+
+        scheme.validate(orphanage, {
+            abortEarly: false
+        })
 
         const rep = getRepository(Orphanage)
 
