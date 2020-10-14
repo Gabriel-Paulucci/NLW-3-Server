@@ -20,7 +20,33 @@ export default {
     },
 
     async create(req: Request, res: Response) {
-        const orphanage = req.body as Orphanage
+        const {
+            name,
+            latitude,
+            longitude,
+            about,
+            instructions,
+            openingHours,
+            openOnWeekends
+        } = req.body
+
+        const reqImages = req.files as Express.Multer.File[]
+        const images = reqImages.map(x => {
+            return {
+                path: x.filename
+            }
+        })
+
+        const orphanage = {
+            name: name,
+            latitude: latitude,
+            longitude: longitude,
+            about: about,
+            instructions: instructions,
+            openingHours: openingHours,
+            openOnWeekends: openOnWeekends,
+            images: images
+        } as Orphanage
 
         const rep = getRepository(Orphanage)
 
