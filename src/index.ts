@@ -1,12 +1,13 @@
 import express, { json, Router } from 'express'
 import { createConnection } from 'typeorm'
 import glob from 'glob'
+import errorHendler from './errors/hendler'
 
 createConnection().then(connection => {
 
     const server = express()
     server.use(json())
-
+    
     glob('./src/routes/**/*.ts', {
         absolute: true
     }, (error, files) => {
@@ -15,7 +16,8 @@ createConnection().then(connection => {
             server.use(route)
         }
     })
-
+    
+    server.use(errorHendler)
     server.listen(5000, () => {
         console.log('Server star in port: 5000')
     })
